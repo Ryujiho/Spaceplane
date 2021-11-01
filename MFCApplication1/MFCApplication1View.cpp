@@ -32,13 +32,15 @@ BEGIN_MESSAGE_MAP(CMFCApplication1View, CView)
 	ON_WM_LBUTTONUP()
 	ON_WM_MOUSEMOVE()
 	ON_WM_KEYDOWN()
+	ON_WM_CHAR()
 END_MESSAGE_MAP()
 
 // CMFCApplication1View 생성/소멸
 CMFCApplication1View::CMFCApplication1View() noexcept
 {
 	m_mouseMove = false;
-	m_camera_x = m_camera_y = 0.f;
+	m_camera_x = 5.f;
+	m_camera_y = 5.f;
 }
 CMFCApplication1View::~CMFCApplication1View()
 {
@@ -276,8 +278,30 @@ void CMFCApplication1View::DrawGLScene(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
 
-	gluLookAt(m_camera_x, m_camera_y+3.f, 6.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f);
+	if (!m_B836042.m_defaultMode) {
+		GLfloat positionY = m_B836042.m_positionY;
+		GLfloat positionZ = m_B836042.m_positionZ;
+		GLfloat cameraX, cameraY, cameraZ;
+		 cameraY = positionY; cameraZ = positionZ;
 
+		if (m_B836042.m_isRight) {
+			cameraZ += 2; cameraY += 1;
+		}
+		else if (m_B836042.m_isUp) {
+			cameraY -= 2;
+			cameraZ += 1;
+		} else if (m_B836042.m_isDown) {
+			cameraY += 2;
+			cameraZ += 1;
+		} else {
+			cameraZ -= 2; cameraY += 1;
+		}
+
+		gluLookAt(0, cameraY, cameraZ,   0.f, positionY, positionZ,  0.f, 1.f, 0.f);
+	}
+	else {
+		gluLookAt(m_camera_x, m_camera_y, 3.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f);
+	}
 	GLdouble angleX, angleY;
 	if (m_mouseMove) {
 		angleX = 1 * (m_mouseCurrentPoint.x - m_mouseAnchorPoint.x);
@@ -286,8 +310,10 @@ void CMFCApplication1View::DrawGLScene(void) {
 		glRotatef(angleY, 1, 0, 0);
 	}
 
-	drawTwoLights();
-	m_Lab.draw_lab5();
+	//drawTwoLights();	m_Lab.draw_lab5();
+	m_B836042.draw();
+
+	
 
 	SwapBuffers(m_hDC);
 }
@@ -305,26 +331,78 @@ void CMFCApplication1View::OnLButtonUp(UINT nFlags, CPoint point)
 }
 void CMFCApplication1View::OnMouseMove(UINT nFlags, CPoint point)
 {
-	if (m_mouseMove) {
-		m_mouseCurrentPoint = point;
-	}
+	m_mouseCurrentPoint = point;
+	
 	CView::OnMouseMove(nFlags, point);
 }
 void CMFCApplication1View::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 	switch (nChar) {
-	case VK_LEFT:
-		m_camera_x -= 0.1;
+		if (!m_B836042.m_defaultMode) {
+			case VK_LEFT:
+				m_camera_x -= 0.1;
+				break;
+			case VK_RIGHT:
+				m_camera_x += 0.1;
+				break;
+			case VK_UP:
+				m_camera_y -= 0.1;
+				break;
+			case VK_DOWN:
+				m_camera_y += 0.1;
+				break;
+		}
+	case VK_OEM_PLUS: case VK_ADD:
+		m_B836042.m_airplane_speed += 0.1; // 나중에 기준 변경
+		m_B836042.m_isMoved = false;
 		break;
-	case VK_RIGHT:
-		m_camera_x += 0.1;
-		break;
-	case VK_UP:
-		m_camera_y -= 0.1;
-		break;
-	case VK_DOWN:
-		m_camera_y += 0.1;
+	case VK_OEM_MINUS: case VK_SUBTRACT:
+		m_B836042.m_airplane_speed -= 0.1;
+		m_B836042.m_isMoved = false;
 		break;
 	}
 	CView::OnKeyDown(nChar, nRepCnt, nFlags);
+}
+
+
+void CMFCApplication1View::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+
+	//enter, back, space, esc 인지를 검사한다. 해당 문자들은 제대로된 ASCII코드가 될 수 없으므로 제외.
+	if (nChar != VK_RETURN && nChar != VK_BACK && nChar != VK_ESCAPE) {
+		if (nChar == 'a' || nChar == 'd' || nChar == 'w' || nChar == 's') {
+			m_B836042.m_isLeft = m_B836042.m_isRight = m_B836042.m_isUp = m_B836042.m_isDown = false;
+			m_B836042.m_isMoved = true;
+		}
+
+		switch (nChar) {
+		case 'a': //좌 회전 후 이동
+			m_B836042.m_countLeft++;
+			m_B836042.m_isLeft = true;
+			break;
+		case 'd': // 우 
+			m_B836042.m_countRight++;
+			m_B836042.m_isRight = true;
+			break;
+		case 'w': // 위
+			m_B836042.m_countUp++;
+			m_B836042.m_isUp = true;
+			break;
+		case 's': //아래
+			m_B836042.m_countDown++;
+			m_B836042.m_isDown = true;
+			break;
+
+		case '1':	//디폴트 위치, 즉, +Z 방향에서 원점을 향해 보고 있는 시점
+			m_B836042.m_defaultMode = true;
+			m_camera_x = m_camera_y = 5.0f;
+			break;
+
+		case '2':	//비행체 뒤에서 따라 다니며(뒤에서, 그리고 약간 위에서)비행체 후면을 바라보는 시점
+			m_B836042.m_defaultMode = false;
+			break;
+		}
+	}
+	CView::OnChar(nChar, nRepCnt, nFlags);
 }

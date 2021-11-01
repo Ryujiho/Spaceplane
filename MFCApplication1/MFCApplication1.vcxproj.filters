@@ -57,13 +57,13 @@
     <ClInclude Include="pch.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="B836042.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="StdAfx.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Lab.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="B836042.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
@@ -101,10 +101,10 @@
     <ClCompile Include="pch.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="B836042.cpp">
+    <ClCompile Include="Lab.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Lab.cpp">
+    <ClCompile Include="B836042.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

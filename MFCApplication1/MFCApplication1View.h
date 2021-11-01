@@ -30,13 +30,13 @@ public:
 	CPoint m_mouseAnchorPoint;  //눌렀을때
 	CPoint m_mouseCurrentPoint; //현재위치
 
+
 public:
 	BOOL	SetDevicePixelFormat(HDC hdc);
 	void	InitGL(void);
 	void	ReSizeGLScene(GLsizei width, GLsizei height);
 	void	DrawGLScene(void);
 	
-
 // 특성입니다.
 public:
 	CMFCApplication1Doc* GetDocument() const;
@@ -77,6 +77,7 @@ public:
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
+	afx_msg void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
 };
 
 #ifndef _DEBUG  // MFCApplication1View.cpp의 디버그 버전
