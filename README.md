@@ -14,6 +14,7 @@
 - [x] Control plane with keyboard and mouse
 - [x] Control plane speed
 - [x] Control camera view (1: +z direction to origin, 2: behind the plane)
+- [x] Apply Texture image 
 
 ## Demo
 ![캡처](https://user-images.githubusercontent.com/4311289/148686230-285ec545-3e02-40f1-bc05-130767ee6ac4.PNG)
